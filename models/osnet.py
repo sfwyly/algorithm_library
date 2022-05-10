@@ -1,8 +1,9 @@
 
 """
     @Author: Junjie Jin
-    @Description: OSNet
     @Date: 2022/5/9
+    @Description: OSNet
+        轻量级网络
 """
 
 import tensorflow as tf
