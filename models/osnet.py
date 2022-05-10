@@ -3,7 +3,7 @@
     @Author: Junjie Jin
     @Date: 2022/5/9
     @Description: OSNet
-        轻量级网络 
+        轻量级网络
 """
 
 import tensorflow as tf
@@ -40,14 +40,14 @@ class Conv(layers.Layer):
         super(Conv, self).__init__()
         # self.conv = layers.Conv2D(out_channels, kernel_size=kernel_size, strides=strides, padding='same', use_bias=use_bias, groups=1)
 
-        # self.conv = GroupsConv(in_channels, out_channels, kernel_size, strides, use_bias=use_bias, groups=groups)
+        self.conv = GroupsConv(in_channels, out_channels, kernel_size, strides, use_bias=use_bias, groups=groups)
         self.bn = layers.BatchNormalization()
-        # self.relu = layers.ReLU()
+        self.relu = layers.ReLU()
 
     def call(self, x):
-        # x = self.conv(x)
+        x = self.conv(x)
         x = self.bn(x)
-        # x = self.relu(x)
+        x = self.relu(x)
         return x
 
 
