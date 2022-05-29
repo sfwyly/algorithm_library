@@ -135,13 +135,13 @@ class ResBlock(layers.Layer):
             layers.Conv2D(out_channels, kernel_size=3, strides=strides, padding='same'),
             layers.BatchNormalization(),
             layers.ReLU(),
-            layers.Conv2D(out_channels, kernel_size=3, strides=1, padding='same')
+            layers.Conv2D(out_channels, kernel_size=3, strides=1, padding='same'),
             layers.BatchNormalization()
         ])
         self.short_cut = models.Sequential()
         if strides != 1 or in_channels != out_channels:
             self.short_cut = models.Sequential([
-                layers.Conv2D(out_channels, kernel_size=1, strides=1, use_bias=False)
+                layers.Conv2D(out_channels, kernel_size=1, strides=1, use_bias=False),
                 layers.BatchNormalization()
             ])
     def call(self, x):
