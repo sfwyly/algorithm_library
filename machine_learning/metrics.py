@@ -6,6 +6,11 @@
 # """
 import numpy as np
 import matplotlib.pyplot as plt
+from skimage.measure import compare_ssim as ssim
+from models.inception import InceptionV3
+import torch
+from scipy import linalg
+import lpips
 
 
 class Metric:
@@ -79,6 +84,69 @@ class Metric:
                 N += 1
         auc = (rank - M* (1 + M) // 2) / (M*N)
         return auc
+
+    def getPSNR(self, img_a, img_b):
+        """
+        计算峰值信噪比
+        :param img_a:
+        :param img_b:
+        :return:
+        """
+        assert img_a.shape == img_b.shape, "图像尺寸大小不相同"
+        height, width, _ = img_a.shape
+
+        channel_mse = np.sum((img_a - img_b) ** 2, axis=(0, 1)) / (height * width)
+        mse = np.mean(channel_mse)
+        Max = 1.0  # 最大图像
+        PSNR = 10. * np.log10(Max ** 2 / mse)  # 峰值信噪比
+        return PSNR
+
+    def getSSIM(self, img_a, img_b):
+        """
+        计算结构相似性
+        :param img_a:
+        :param img_b:
+        :return:
+        """
+        return ssim(img_b, img_a, data_range=1, multichannel=True)
+
+    def getFID(self, img_a, img_b):
+        """
+        获取
+        :param img_a:
+        :param img_b:
+        :return:
+        """
+        def frechet_distance(mu, cov, mu2, cov2):
+            cc, _ = np.linalg.sqrtm(np.dot(cov, cov2), disp=False)
+            dist = np.sum((mu - mu2) ** 2) + np.trace(cov + cov2 - 2 * cc)
+            return np.real(dist)
+        device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+        inception = InceptionV3().eval().to(device)
+        mu, cov = [], []
+        for img in [img_a, img_b]:
+            actvs = []
+            actv = inception(torch.from_numpy(np.transpose(img[np.newaxis, ...], (0, 2, 3, 1))))
+            actvs.append(actv)
+            actvs = torch.cat(actvs, dim=0).cpu().detach().numpy()
+            mu.append(np.mean(actv, axis=0))
+            cov.append(np.cov(actvs, rowvar=False))
+        fid_value = frechet_distance(mu[0], cov[0], mu[1], cov[1])
+        return fid_value
+
+    def getLPIPS(self, net, img_a, img_b):
+        """
+        The Unreasonable Effectiveness of Deep Features as a Perceptual Metric
+        :param net:
+        :param img_a:
+        :param img_b:
+        :return:
+        """
+        device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+        loss_fn = lpips.LPIPS(net=net).to(device)
+        img0 = lpips.im2tensor(img_a)
+        img1 = lpips.im2tensor(img_b)
+        return loss_fn.forward(img0, img1)
 
 
 if __name__ == '__main__':
