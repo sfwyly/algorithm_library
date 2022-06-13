@@ -144,7 +144,8 @@ class ResBlock(layers.Layer):
                 layers.Conv2D(out_channels, kernel_size=1, strides=1, use_bias=False),
                 layers.BatchNormalization()
             ])
+
     def call(self, x):
-        return tf.nn.relu(self.left(x), self.short_cut(x))
+        return tf.nn.relu(self.left(x) + self.short_cut(x))
 
 
