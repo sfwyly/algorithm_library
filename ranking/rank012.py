@@ -3,7 +3,8 @@
 
 """
 
-def solution(nums):
+
+def rank(nums):
 
     length = len(nums)
     l = 0
@@ -38,5 +39,6 @@ def solution(nums):
                 r -= 1
     return nums
 
+
 nums = [2,2,2,1,0,1,0,0,1,2,2,0,1]
-print(solution(nums))
+print(rank(nums))

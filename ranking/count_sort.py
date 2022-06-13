@@ -21,5 +21,6 @@ def count_sort(nums):
             j += 1
     return ns, ans
 
+
 if __name__ == '__main__':
     print(count_sort([5, 4, 3, 1, 3, 2]))

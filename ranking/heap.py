@@ -45,5 +45,6 @@ def rank(nums, r):
         rankRange(nums, 0, r - i - 1)
     print(nums)
 
+
 nums = [0, 8 ,7, 6, 5, 4, 3, 2, 1, 9]
 rank(nums, len(nums))
